@@ -2,6 +2,7 @@ const express = require('express');
 const prisma = require('./utils/db');
 
 const userRoute = require('./routes/userRoute');
+const taskRoute = require('./routes/taskRoute');
 
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(express.json());
 
 // routes
 app.use('/api/v1/users', userRoute);
+app.use('/api/v1/tasks', taskRoute);
 
 // 404 handler
 app.use((req, res) => {
