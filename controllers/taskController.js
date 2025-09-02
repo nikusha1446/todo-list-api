@@ -30,4 +30,34 @@ const createTask = async (req, res) => {
   }
 };
 
-module.exports = { createTask };
+const getTasks = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { status } = req.query;
+
+    const whereClause = { userId };
+    if (status && ['PENDING', 'IN_PROGRESS', 'COMPLETED'].includes(status)) {
+      whereClause.status = status;
+    }
+
+    const tasks = await prisma.task.findMany({
+      where: whereClause,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ tasks, count: tasks.length });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error ' });
+  }
+};
+
+module.exports = { createTask, getTasks };
