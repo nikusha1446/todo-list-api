@@ -145,4 +145,34 @@ const updateTask = async (req, res) => {
   }
 };
 
-module.exports = { createTask, getTasks, getTask, updateTask };
+const deleteTask = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const existingTask = await prisma.task.findFirst({
+      where: {
+        userId,
+        id,
+      },
+    });
+
+    if (!existingTask) {
+      return res.status(404).json({ error: 'Task not found or access denied' });
+    }
+
+    await prisma.task.delete({
+      where: {
+        id,
+      },
+    });
+
+    res.status(200).json({ message: 'Task deleted successfully' });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { createTask, getTasks, getTask, updateTask, deleteTask };
