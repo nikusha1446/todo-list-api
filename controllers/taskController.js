@@ -56,8 +56,37 @@ const getTasks = async (req, res) => {
 
     res.status(200).json({ tasks, count: tasks.length });
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error ' });
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-module.exports = { createTask, getTasks };
+const getTask = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const task = await prisma.task.findUnique({
+      where: {
+        id,
+        userId,
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!task) {
+      res.status(404).json({ error: 'Task not found or access denied' });
+    }
+
+    res.status(200).json({ task });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { createTask, getTasks, getTask };
