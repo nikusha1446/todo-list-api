@@ -65,7 +65,7 @@ const getTask = async (req, res) => {
     const userId = req.user.id;
     const { id } = req.params;
 
-    const task = await prisma.task.findUnique({
+    const task = await prisma.task.findFirst({
       where: {
         id,
         userId,
@@ -80,7 +80,7 @@ const getTask = async (req, res) => {
     });
 
     if (!task) {
-      res.status(404).json({ error: 'Task not found or access denied' });
+      return res.status(404).json({ error: 'Task not found or access denied' });
     }
 
     res.status(200).json({ task });
